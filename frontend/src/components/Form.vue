@@ -8,7 +8,7 @@
     <form class="review-form" @submit.prevent="onSubmit">
       <p>
         <label for="number">Number:</label>
-        <input id="number" v-model="number" placeholder="number" />
+        <input id="number" v-model.number="number" placeholder="number" />
       </p>
 
       <p>
@@ -16,35 +16,45 @@
       </p>
     </form>
 
-    <h1>{{ results }}</h1>
+    <p v-if="errors.length">
+      <b>Please correct the following error(s):</b>
+      <ul>
+        <li v-for="error in errors" :key="error">{{ error }}</li>
+      </ul>
+    </p>
+
+    <h2>{{ results }}</h2>
   </div>
 </template>
 
 <script>
 export default {
-  name: "HelloWorld",
+  name: "Form",
   props: {
-    results: [],
-    number: Number,
-    errors: []
+    value: Number,
+    results: Array
   },
-  beforeMount() {
-    this.getFibonacciSequence();
+  data() {
+    return {
+      number: this.value,
+      errors: []
+    }
   },
   methods: {
-    async getFibonacciSequence(data) {
-      const res = await fetch(process.env.API_URL, {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: {"Content-type": "application/json; charset=UTF-8"}
+    getFibonacciSequence(data) {
+      this.$http.get(process.env.VUE_APP_API_URL + 'api/get_fibonacci.php/?id=' + data)
+      .then((result) => {
+        this.results = result.data.Fibonacci_sequence;
       })
-      .then(response => response.json()) 
-      .then(json => { this.results = json })
-      .catch(err => console.log(err));
     },
     onSubmit() {
-      console.log("hello")
-      this.number ? this.getFibonacciSequence(this.number) : this.errors.push("Number required");
+      this.errors = [];
+      if(this.number && Number.isSafeInteger(this.number) && this.number <= 5000) {
+        this.getFibonacciSequence(this.number);
+      } else {
+        this.errors.push("Number required");
+        this.results = null;
+      }
     }
   }
 };
