@@ -26,4 +26,3 @@
         http_response_code(404);
         echo json_encode("Error in fibonacci function");
     }
-?>
