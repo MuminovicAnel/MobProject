@@ -2,8 +2,8 @@
 
   class Fibonacci{
 
-    public Int $firstNumber;
-    public Int $secondNumber;
+    private Int $firstNumber;
+    private Int $secondNumber;
 
     
     public function __construct(){
